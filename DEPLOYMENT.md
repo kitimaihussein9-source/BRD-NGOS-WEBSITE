@@ -6,6 +6,10 @@ This project is a PHP application with PHP sessions, file uploads, and MySQL. Ve
 
 Use a PHP-compatible host such as shared cPanel hosting, Render with a PHP web service, Railway, or a VPS. The database can be hosted by the same provider or by a managed MySQL provider.
 
+## Prisma note
+
+This repository does not contain a Node.js project or Prisma schema. Its database layer is implemented in `db.php` using PDO and MySQL, and the schema reference is `database.sql`. A Prisma database deployment cannot be connected to this PHP application without rewriting the data layer as a Node.js service or adding a separate API. Do not add Prisma only for deployment; it would not make the PHP pages run on Vercel.
+
 ## Production checklist
 
 1. Create a MySQL database and application user.
@@ -47,3 +51,7 @@ If Vercel is required for the public frontend, split the system into two deploym
 - PHP host: this repository's authentication, admin, admissions, uploads, and API/database layer
 
 The frontend would need to call an HTTPS API on the PHP host. Do not place database credentials in Vercel frontend code.
+
+## What is still required for a real launch
+
+The codebase is prepared, but deployment cannot be completed from this workspace without access to a hosting account, production database credentials, and a domain or deployment token. The first production target should be a PHP host. After deployment, verify every route listed in the production checklist and configure the database variables in the host dashboard, never in committed files.
