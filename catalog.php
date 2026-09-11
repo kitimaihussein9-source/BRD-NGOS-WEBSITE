@@ -1,0 +1,29 @@
+<?php
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'db.php';
+$type = $_GET['type'] ?? 'course';
+$allowed = ['course', 'consultancy', 'announcement'];
+$type = in_array($type, $allowed, true) ? $type : 'course';
+$labels = ['course' => ['Research training', 'Training that travels with you.', 'Explore methodology, data, GIS, and mobile research programmes.'], 'consultancy' => ['Consultancy services', 'Research support with a clear next step.', 'Work with BRD on research design, data, evaluation, analysis, or GIS.'], 'announcement' => ['BRD updates', 'What is happening at BRD.', 'Read the latest research, project, and programme announcements.']];
+$view = $labels[$type];
+$database = db();
+$statement = $database->prepare('SELECT title, details, image_path, video_path, created_at FROM content WHERE type = ? ORDER BY id DESC');
+$statement->execute([$type]);
+$items = $statement->fetchAll();
+$esc = static fn ($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+?>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><?= $esc($view[0]) ?> | BRD Research Consulting Centre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+  <style>
+    .catalog-page{min-height:100vh;background:var(--cream)}.catalog-header,.catalog-main,.catalog-footer{max-width:1240px;margin:auto}.catalog-header{height:95px;padding:0 32px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d9dcd7}.catalog-header .brand-mark{transform:scale(.84);transform-origin:left top;margin-bottom:-5px}.catalog-links{display:flex;gap:24px}.catalog-links a{color:var(--ink);font-size:13px;font-weight:700;text-decoration:none}.catalog-main{padding:70px 32px 90px}.catalog-hero{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:44px}.catalog-hero h1{max-width:700px;margin:12px 0;color:var(--navy);font:600 clamp(56px,8vw,98px)/.86 "Barlow Condensed",sans-serif;text-transform:uppercase}.catalog-hero p:not(.eyebrow){max-width:560px;color:var(--muted);line-height:1.7}.catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.catalog-card{background:#fff;border-top:5px solid var(--red);overflow:hidden}.catalog-card:nth-child(2n){border-color:var(--green)}.catalog-card:nth-child(3n){border-color:var(--navy)}.catalog-card-media{display:block;width:100%;height:210px;object-fit:cover}.catalog-card-body{padding:24px}.catalog-card h2{margin:9px 0;color:var(--navy);font:600 32px/1 "Barlow Condensed",sans-serif;text-transform:uppercase}.catalog-card p:not(.eyebrow){color:var(--muted);font-size:13px;line-height:1.65}.catalog-action{display:inline-block;margin-top:15px;color:var(--navy);font-size:12px;font-weight:700;text-decoration:none}.catalog-action span{padding-left:6px}.catalog-empty{padding:30px;background:#fff;color:var(--muted)}.catalog-footer{padding:0 32px 28px;display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.catalog-footer a{color:var(--navy);font-weight:700;text-decoration:none}@media(max-width:760px){.catalog-header{height:auto;padding:22px 20px;display:block}.catalog-links{margin-top:14px;gap:16px;overflow:auto}.catalog-links a{white-space:nowrap}.catalog-main{padding:46px 20px 60px}.catalog-hero{display:block}.catalog-grid{grid-template-columns:1fr}.catalog-footer{padding:0 20px 22px;display:block}.catalog-footer p{margin-bottom:10px}}
+  </style>
+</head>
+<body><div class="topline"></div><div class="catalog-page">
+  <header class="catalog-header"><a class="brand" href="index.php" aria-label="BRD home"><span class="brand-mark"><b>B</b><b class="torch">R<span>●</span></b><b>D<i>••</i></b></span><span class="brand-subtitle">Building Resilience to Disasters</span></a><nav class="catalog-links" aria-label="Catalogue navigation"><a href="catalog.php?type=course">Training</a><a href="catalog.php?type=consultancy">Consultancy</a><a href="catalog.php?type=announcement">Updates</a><a href="index.php#contact">Contact</a></nav></header>
+  <main class="catalog-main"><section class="catalog-hero"><div><p class="eyebrow"><?= $esc($view[0]) ?></p><h1><?= $esc($view[1]) ?></h1><p><?= $esc($view[2]) ?></p></div><a class="text-link" href="index.php">Back to BRD <span>↗</span></a></section><section class="catalog-grid" aria-label="<?= $esc($view[0]) ?> listings"><?php foreach ($items as $item): ?><article class="catalog-card"><?php if (!empty($item['image_path'])): ?><img class="catalog-card-media" src="<?= $esc($item['image_path']) ?>" alt="<?= $esc($item['title']) ?> image"><?php elseif (!empty($item['video_path'])): ?><video class="catalog-card-media" controls preload="metadata"><source src="<?= $esc($item['video_path']) ?>"></video><?php endif; ?><div class="catalog-card-body"><p class="eyebrow"><?= $esc($view[0]) ?></p><h2><?= $esc($item['title']) ?></h2><p><?= $esc($item['details']) ?></p><?php if ($type === 'course'): ?><a class="catalog-action" href="index.php#contact">Ask about admission <span>→</span></a><?php elseif ($type === 'consultancy'): ?><a class="catalog-action" href="index.php#contact">Request consultancy <span>→</span></a><?php endif; ?></div></article><?php endforeach; ?><?php if (!$items): ?><p class="catalog-empty">No <?= strtolower($esc($view[0])) ?> have been published yet. Check back soon.</p><?php endif; ?></section></main>
+  <footer class="catalog-footer"><p>BRD Research Consulting Centre · <?= $esc($view[0]) ?></p><a href="index.php#top">Back to top ↑</a></footer>
+</div></body></html>

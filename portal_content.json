@@ -1,0 +1,41 @@
+{
+    "announcements": [
+        {
+            "title": "Applications open: Research methods cohort 05",
+            "body": "Applications are open for the next research methodology and data analysis training cohort. Places are reviewed in the order received."
+        },
+        {
+            "title": "New consultancy service: GIS and spatial analysis",
+            "body": "BRD is accepting consultancy requests for mapping, spatial datasets, and GIS-based research planning."
+        },
+        {
+            "title": "Client documents now available online",
+            "body": "Approved clients can use this workspace to follow project updates, submit feedback, and receive next-step instructions."
+        }
+    ],
+    "courses": [
+        {
+            "title": "Advanced research methodology",
+            "details": "6 weeks · Online and blended · Applications open"
+        },
+        {
+            "title": "SPSS, STATA and R data analysis",
+            "details": "4 weeks · Practical labs · Certificate on completion"
+        },
+        {
+            "title": "ODK and KoboToolbox mobile data collection",
+            "details": "2 weeks · Online intensive · Next intake announced soon"
+        }
+    ],
+    "consultancy": [
+        {
+            "title": "Research design and proposal development"
+        },
+        {
+            "title": "Data collection, management and analysis"
+        },
+        {
+            "title": "Monitoring, evaluation and GIS support"
+        }
+    ]
+}

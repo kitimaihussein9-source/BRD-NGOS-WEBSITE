@@ -1,0 +1,3 @@
+<FilesMatch "^(brd\.sqlite|accounts\.json|client_requests\.json|portal_content\.json|database\.sql)$">
+    Require all denied
+</FilesMatch>
