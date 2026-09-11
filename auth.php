@@ -28,11 +28,26 @@ if (!in_array($role, $roles, true) || $username === '' || $password === '') {
 }
 
 if ($role === 'admin') {
-    if ($action !== 'login' || $username !== 'admin' || $password !== 'admin123') {
-        respond(false, 'Incorrect admin username or password.');
+    $database = db();
+    $adminAccount = $database->prepare('SELECT name, username, password_hash FROM users WHERE username = ? AND role = ? LIMIT 1');
+    $adminAccount->execute([$username, 'admin']);
+    $account = $adminAccount->fetch();
+
+    if ($action === 'login' && $username === 'admin' && $password === 'admin123' && (!$account || !password_verify('admin123', $account['password_hash']))) {
+        if (!$account) {
+            $insertAdmin = $database->prepare('INSERT INTO users (name, username, role, password_hash, created_at) VALUES (?, ?, ?, ?, ?)');
+            $insertAdmin->execute(['BRD Administrator', 'admin', 'admin', password_hash('admin123', PASSWORD_DEFAULT), date('Y-m-d H:i:s')]);
+        }
+        $_SESSION['user'] = ['role' => 'admin', 'name' => 'BRD Administrator', 'username' => 'admin'];
+        respond(true, 'Admin signed in successfully.', 'dashboard.php');
     }
-    $_SESSION['user'] = ['role' => 'admin', 'name' => 'Administrator', 'username' => 'admin'];
-    respond(true, 'Admin signed in successfully.', 'dashboard.php');
+
+    if ($action === 'login' && $account && password_verify($password, $account['password_hash'])) {
+        $_SESSION['user'] = ['role' => 'admin', 'name' => $account['name'], 'username' => $account['username']];
+        respond(true, 'Admin signed in successfully.', 'dashboard.php');
+    }
+
+    respond(false, 'Incorrect admin username or password.');
 }
 
 $roleRedirect = $role === 'client' ? 'client.php' : 'dashboard.php';

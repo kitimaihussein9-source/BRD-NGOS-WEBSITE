@@ -491,6 +491,19 @@ h2 em {
     margin: 0
 }
 
+.card-link {
+    display: inline-block;
+    margin-top: 18px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none
+}
+
+.card-link span {
+    padding-left: 6px
+}
+
 .card-number {
     position: absolute;
     right: 28px;

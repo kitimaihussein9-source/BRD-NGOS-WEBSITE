@@ -54,9 +54,24 @@ $data = $dashboardData[$role];
 $actionLink = in_array($role, ['admin', 'assistant'], true) ? 'manage.php' : 'index.php#contact';
 $database = db();
 if ($role === 'admin') {
+  $recentRequests = $database->query('SELECT subject, type, status, created_at FROM requests ORDER BY created_at DESC LIMIT 3')->fetchAll();
+  $data['items'] = [];
+  foreach ($recentRequests as $request) {
+    $data['items'][] = [
+      'title' => $request['subject'] !== '' ? $request['subject'] : ucfirst((string) $request['type']) . ' request',
+      'meta' => ucfirst((string) $request['type']) . ' request · ' . date('M j, Y', strtotime($request['created_at'])),
+      'status' => $request['status']
+    ];
+  }
+  if (!$data['items']) {
+    $data['items'][] = ['title' => 'No requests submitted yet', 'meta' => 'New BRD activity will appear here', 'status' => 'Ready'];
+  }
   $data['stats'][0]['value'] = str_pad((string) $database->query('SELECT COUNT(*) FROM requests')->fetchColumn(), 2, '0', STR_PAD_LEFT);
-  $data['stats'][1]['value'] = str_pad((string) $database->query("SELECT COUNT(*) FROM requests WHERE status IN ('Submitted', 'Under review')")->fetchColumn(), 2, '0', STR_PAD_LEFT);
+  $pendingRequests = (int) $database->query("SELECT COUNT(*) FROM requests WHERE status IN ('Submitted', 'Under review')")->fetchColumn();
+  $data['stats'][1]['value'] = str_pad((string) $pendingRequests, 2, '0', STR_PAD_LEFT);
   $data['stats'][2]['value'] = str_pad((string) $database->query('SELECT COUNT(*) FROM users')->fetchColumn(), 2, '0', STR_PAD_LEFT);
+  $data['focus'] = $pendingRequests === 0 ? 'The request queue is clear.' : $pendingRequests . ' request' . ($pendingRequests === 1 ? ' needs' : 's need') . ' your attention.';
+  $data['focusDetail'] = $pendingRequests === 0 ? 'New admissions, volunteer, and research support requests will appear here for review.' : 'Review the latest submissions and update their status from the operations workspace.';
 } elseif ($role === 'assistant') {
   $data['stats'][1]['value'] = str_pad((string) $database->query("SELECT COUNT(*) FROM content WHERE type = 'course'")->fetchColumn(), 2, '0', STR_PAD_LEFT);
   $data['stats'][2]['value'] = str_pad((string) $database->query("SELECT COUNT(*) FROM requests WHERE status IN ('Submitted', 'Under review')")->fetchColumn(), 2, '0', STR_PAD_LEFT);
@@ -91,7 +106,7 @@ if ($role === 'admin') {
   <div class="dashboard-shell">
     <header class="dashboard-header">
       <a class="brand" href="index.php" aria-label="BRD home"><span class="brand-mark"><b>B</b><b class="torch">R<span>●</span></b><b>D<i>••</i></b></span><span class="brand-subtitle">Building Resilience to Disasters</span></a>
-      <div class="dashboard-user"><div class="user-chip"><span><?= $name ?></span><span class="user-initial"><?= strtoupper(substr($user['name'], 0, 1)) ?></span></div><?php if (in_array($role, ['admin', 'assistant'], true)): ?><a class="text-link" href="manage.php">Operations <span>→</span></a><?php endif; ?><a class="text-link" href="logout.php">Sign out <span>↗</span></a></div>
+      <div class="dashboard-user"><div class="user-chip"><span><?= $name ?></span><span class="user-initial"><?= strtoupper(substr($user['name'], 0, 1)) ?></span></div><?php if (in_array($role, ['admin', 'assistant'], true)): ?><a class="text-link" href="manage.php">Operations <span>→</span></a><?php endif; ?><?php if ($role === 'admin'): ?><a class="text-link" href="reports.php">Reports <span>→</span></a><?php endif; ?><a class="text-link" href="profile.php">Profile <span>→</span></a><a class="text-link" href="logout.php">Sign out <span>↗</span></a></div>
     </header>
     <nav class="dashboard-nav" aria-label="Dashboard navigation"><a href="#overview">Overview</a><a href="#workspace">Workspace</a><a href="#actions">Quick actions</a><a href="index.php#contact">Support</a></nav>
     <main class="dashboard-main">

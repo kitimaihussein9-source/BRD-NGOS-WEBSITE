@@ -52,7 +52,7 @@ $initial = htmlspecialchars(strtoupper(substr($user['name'], 0, 1)), ENT_QUOTES,
   <div class="client-shell">
     <header class="client-header">
       <a class="brand" href="index.php" aria-label="BRD home"><span class="brand-mark"><b>B</b><b class="torch">R<span>●</span></b><b>D<i>••</i></b></span><span class="brand-subtitle">Building Resilience to Disasters</span></a>
-      <div class="client-user"><span><?= $name ?></span><span class="client-initial"><?= $initial ?></span><a class="text-link" href="logout.php">Sign out <span>↗</span></a></div>
+      <div class="client-user"><span><?= $name ?></span><span class="client-initial"><?= $initial ?></span><a class="text-link" href="profile.php">Profile <span>→</span></a><a class="text-link" href="logout.php">Sign out <span>↗</span></a></div>
     </header>
     <main class="client-main">
       <section class="client-hero"><div><p class="eyebrow">Client workspace</p><h1>Your research, clearly in view.</h1><p>Track your projects, keep your documents close, and find trusted admissions resources from one place.</p></div><span class="client-date"><?= date('F j, Y') ?></span></section>
